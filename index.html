@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kassadillo</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <!-- CSS (sıra önemli) -->
+  <link rel="stylesheet" href="./css/main.css" />
+  <link rel="stylesheet" href="./css/youtube-ui.css" />
+  <link rel="stylesheet" href="./css/modals.css" />
+</head>
+<body>
+
+  <div class="app">
+    <!-- SOL: Kontrol Paneli -->
+    <aside class="panel" aria-label="Kontrol Paneli">
+      <div class="panel__header">
+        <h1 class="panel__title">Kanal Ön İzleme</h1>
+        <p class="panel__subtitle">Soldan düzenle, sağda anlık gör</p>
+      </div>
+
+      <div class="panel__section">
+        <h2 class="panel__sectionTitle">Görseller</h2>
+
+        <label class="field">
+          <span class="field__label">Kanal Banner</span>
+          <input id="bannerInput" class="field__input" type="file" accept="image/*" />
+          <div class="field__hint">Öneri: 2048×1152</div>
+
+          <div class="inlineActions">
+            <button id="editBannerBtn" class="btn btn--secondary" type="button" disabled>Düzenle</button>
+            <button id="removeBannerBtn" class="btn btn--ghost" type="button" disabled>Kaldır</button>
+          </div>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Profil Fotoğrafı (PP)</span>
+          <input id="ppInput" class="field__input" type="file" accept="image/png,image/jpeg,image/webp" />
+          <div class="field__hint">1:1 Boyutunda Görsel Yükleyiniz</div>
+          <div class="inlineActions">
+            <button id="removePpBtn" class="btn btn--ghost" type="button" disabled>Kaldır</button>
+          </div>
+        </label>
+      </div>
+
+      <div class="panel__section">
+        <h2 class="panel__sectionTitle">Metinler</h2>
+
+        <label class="field">
+          <span class="field__label">Kanal Adı</span>
+          <input id="channelNameInput" class="field__input" type="text" placeholder="Örn: My Channel" maxlength="50" />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Kanal @handle</span>
+          <input id="handleInput" class="field__input" type="text" placeholder="@mychannel" />
+          <div id="handleError" class="field__error" aria-live="polite"></div>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Abone Sayısı</span>
+          <input id="subsInput" class="field__input" type="text" placeholder="Örn: 3220" inputmode="numeric" />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Kanal Açıklaması</span>
+          <textarea id="aboutInput" class="field__textarea" rows="3" maxlength="200" placeholder="Maksimum 85 karakter"></textarea>
+        </label>
+      </div>
+
+      <div class="panel__section">
+        <h2 class="panel__sectionTitle">Tema</h2>
+
+        <div class="toggleRow">
+          <button id="themeLightBtn" class="chip chip--active" type="button" data-theme="light">Aydınlık</button>
+          <button id="themeDarkBtn" class="chip" type="button" data-theme="dark">Karanlık</button>
+        </div>
+
+        <div class="field__hint">Sadece YouTube ön izleme panelini etkiler.</div>
+      </div>
+
+      <div class="panel__section">
+        <h2 class="panel__sectionTitle">Videolar</h2>
+
+        <button id="addVideoBtn" class="btn btn--primary" type="button">Video Ekle</button>
+        <div class="field__hint">Maksimum 8 video</div>
+
+        <div id="videoList" class="miniList" aria-label="Eklenen videolar"></div>
+      </div>
+
+      <div class="panel__footer">
+        <div class="muted">Not: A Va Nə Sü Sop Ba Ar...</div>
+      </div>
+    </aside>
+
+    <!-- SAĞ: 16:9 Ön İzleme -->
+    <main class="previewWrap" aria-label="YouTube Ön İzleme">
+      <div class="previewFrame">
+        <div id="ytPreview" class="yt yt--light" aria-hidden="true">
+          <!-- Üst bar (basit iskelet) -->
+          <div class="ytTopbar">
+            <div class="ytTopbar__left">
+              <div class="ytLogo"></div>
+            </div>
+            <div class="ytTopbar__center">
+              <div class="ytSearchBar"></div>
+            </div>
+            <div class="ytTopbar__right">
+              <div class="ytIcon"></div>
+              <div class="ytIcon"></div>
+              <div class="ytAvatarMini"></div>
+            </div>
+          </div>
+
+          <!-- Kanal sayfası -->
+          <div class="ytPage">
+            <!-- Banner -->
+            <div class="ytBanner">
+              <img id="bannerPreviewImg" class="ytBanner__img" alt="" />
+              <div class="ytBanner__fallback"></div>
+            </div>
+
+            <!-- Kanal başlığı -->
+            <div class="ytHeader">
+              <div class="ytHeader__pp">
+                <img id="ppPreviewImg" class="ytPp" alt="" />
+                <div class="ytPp__fallback"></div>
+              </div>
+
+              <div class="ytHeader__meta">
+                <div id="channelNamePreview" class="ytChannelName">Kanal Adı</div>
+                <div class="ytHandleRow">
+                  <span id="handlePreview" class="ytHandle">@handle</span>
+                  <span class="ytDot">•</span>
+                  <span id="subsPreview" class="ytSubs">0 abone</span>
+                </div>
+
+                <div id="aboutPreview" class="ytAbout">Kanal açıklaması burada görünecek.</div>
+              </div>
+
+              <div class="ytHeader__actions">
+                <div class="ytBtn ytBtn--ghost">Abone ol</div>
+              </div>
+            </div>
+
+            <!-- Sekmeler -->
+            <div class="ytTabs">
+              <div class="ytTab ytTab--active">Ana sayfa</div>
+              <div class="ytTab">Videolar</div>
+              <div class="ytTab">Oynatma listeleri</div>
+              <div class="ytTab">Topluluk</div>
+            </div>
+
+            <!-- Video grid -->
+            <div class="ytSectionTitle">Yüklenenler</div>
+            <div id="videoGrid" class="ytGrid"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: Banner kırpma/konumlandırma -->
+  <div id="bannerModal" class="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close="bannerModal"></div>
+    <div class="modal__card" role="dialog" aria-modal="true" aria-label="Banner Düzenle">
+      <div class="modal__header">
+        <div class="modal__title">Banner Düzenle</div>
+        <button class="iconBtn" type="button" data-close="bannerModal" aria-label="Kapat">✕</button>
+      </div>
+
+      <div class="modal__body">
+        <div class="cropStage">
+          <!-- Buraya cropper / canvas gelecek -->
+          <div class="cropStage__placeholder">
+            Banner yüklendiğinde burada kırpma arayüzü açılacak.
+          </div>
+
+          <!-- Kılavuz katmanları (şimdilik iskelet) -->
+          <div class="guides">
+            <div class="guide guide--tv">TV’de görüntülenebilir</div>
+            <div class="guide guide--desktop">Masaüstünde görüntülenebilir</div>
+            <div class="guide guide--safe">Tüm cihazlarda görüntülenebilir (Safe Area)</div>
+          </div>
+        </div>
+
+        <div class="cropControls">
+          <label class="range">
+            <span>Yakınlaştır</span>
+            <input id="bannerZoom" type="range" min="1" max="3" step="0.01" value="1" />
+          </label>
+        </div>
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--secondary" type="button" data-close="bannerModal">İptal</button>
+        <button id="saveBannerBtn" class="btn btn--primary" type="button">Bitti</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Video ekleme -->
+  <div id="videoModal" class="modal" aria-hidden="true">
+    <div class="modal__backdrop" data-close="videoModal"></div>
+    <div class="modal__card" role="dialog" aria-modal="true" aria-label="Video Ekle">
+      <div class="modal__header">
+        <div class="modal__title">Video Ekle</div>
+        <button class="iconBtn" type="button" data-close="videoModal" aria-label="Kapat">✕</button>
+      </div>
+
+      <div class="modal__body">
+        <label class="field">
+          <span class="field__label">Thumbnail</span>
+          <input id="thumbInput" class="field__input" type="file" accept="image/*" />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Video Başlığı</span>
+          <input id="videoTitleInput" class="field__input" type="text" maxlength="100" placeholder="Örn: Yeni video!" />
+        </label>
+
+        <label class="field">
+          <span class="field__label">İzlenme Sayısı</span>
+          <input id="viewsInput" class="field__input" type="text" placeholder="Örn: 12500" inputmode="numeric" />
+        </label>
+
+        <label class="field">
+          <span class="field__label">Yükleme Zamanı</span>
+          <input id="timeAgoInput" class="field__input" type="text" maxlength="30" placeholder="Örn: 2 gün önce" />
+        </label>
+      </div>
+
+      <div class="modal__footer">
+        <button class="btn btn--secondary" type="button" data-close="videoModal">İptal</button>
+        <button id="saveVideoBtn" class="btn btn--primary" type="button">Ekle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS (sıra önemli) -->
+  <script src="./js/ui-manager.js"></script>
+  <script src="./js/cropper-logic.js"></script>
+  <script src="./js/video-system.js"></script>
+</body>
+</html>
