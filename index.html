@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calbor Studio — YouTube Kanal Analiz</title>
+  <meta name="description" content="Rakip YouTube kanallarının yayın saatlerini ve video sıklığını analiz edin." />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/animations.css" />
+</head>
+<body>
+  <!-- ───── Arka plan efektleri ───── -->
+  <div class="bg-glow bg-glow--1" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--2" aria-hidden="true"></div>
+
+  <main class="app" id="app">
+    <!-- ───── Header ───── -->
+    <header class="header">
+      <div class="header__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect width="28" height="28" rx="8" fill="url(#logoGrad)"/>
+          <path d="M10 8l10 6-10 6V8z" fill="#fff"/>
+          <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="28" y2="28">
+            <stop stop-color="#FF0050"/><stop offset="1" stop-color="#FF4D8D"/>
+          </linearGradient></defs>
+        </svg>
+        <span class="header__title">Calbor Studio</span>
+      </div>
+    </header>
+
+    <!-- ───── Arama Bölümü ───── -->
+    <section class="search-section" id="searchSection">
+      <div class="search-card glass-card fade-in">
+        <label for="channelInput" class="search-label">Kanal Analiz Et</label>
+        <div class="search-row">
+          <div class="input-wrap">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+              type="text"
+              id="channelInput"
+              class="search-input"
+              placeholder="@handle, kanal linki veya UC... ID girin"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+          <button id="searchBtn" class="btn btn--primary" type="button">
+            <span class="btn__text">Ara</span>
+            <span class="btn__loader" aria-hidden="true"></span>
+          </button>
+        </div>
+        <p class="search-error" id="searchError" role="alert" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- ───── Kanal Önizleme ───── -->
+    <section class="preview-section hidden" id="previewSection">
+      <div class="preview-card glass-card fade-in">
+        <div class="preview-info">
+          <img id="previewAvatar" class="preview-avatar" src="" alt="" width="56" height="56" />
+          <div class="preview-meta">
+            <h2 id="previewName" class="preview-name"></h2>
+            <p class="preview-sub">Bu kanalı analiz etmek istiyor musunuz?</p>
+          </div>
+        </div>
+        <div class="preview-actions">
+          <button id="analyzeBtn" class="btn btn--accent" type="button">
+            <span class="btn__text">Analiz Et</span>
+            <span class="btn__loader" aria-hidden="true"></span>
+          </button>
+          <button id="cancelBtn" class="btn btn--ghost" type="button">Vazgeç</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───── Sonuçlar ───── -->
+    <section class="results-section hidden" id="resultsSection">
+      <!-- Özet Metrikler -->
+      <div class="metrics-row fade-in" id="metricsRow">
+        <div class="metric-card glass-card">
+          <span class="metric-label">Toplam Video</span>
+          <span class="metric-value" id="metricTotal">—</span>
+          <span class="metric-sub" id="metricTotalSub"></span>
+        </div>
+
+        <div class="metric-card glass-card">
+          <span class="metric-label">En Çok Yayınlanan Saat</span>
+          <span class="metric-value" id="metricPeakHour">—</span>
+          <span class="metric-sub" id="metricPeakSub"></span>
+        </div>
+
+        <!-- ✅ Yeni: Önerilen saat -->
+        <div class="metric-card glass-card">
+          <span class="metric-label">Önerilen Yayın Saati</span>
+          <span class="metric-value" id="metricRecommended">—</span>
+          <span class="metric-sub" id="metricRecommendedSub"></span>
+        </div>
+
+        <!-- ✅ Yeni: Tutarlılık -->
+        <div class="metric-card glass-card">
+          <span class="metric-label">Yayın Düzeni</span>
+          <span class="metric-value" id="metricConsistency">—</span>
+          <span class="metric-sub" id="metricConsistencySub"></span>
+        </div>
+      </div>
+
+      <!-- Mod Seçici -->
+      <div class="mode-bar fade-in">
+        <div class="mode-tabs" role="tablist" aria-label="Zaman aralığı">
+          <button class="mode-tab active" role="tab" aria-selected="true" data-mode="30">Aylık (30)</button>
+          <button class="mode-tab" role="tab" aria-selected="false" data-mode="7">7 Gün</button>
+          <button class="mode-tab" role="tab" aria-selected="false" data-mode="1">1 Gün</button>
+        </div>
+
+        <!-- ✅ Yeni: 1 günlükte oklar -->
+        <div class="mode-date" id="modeDateWrap">
+          <button class="day-nav-btn hidden" id="dayPrevBtn" type="button" aria-label="Önceki gün">‹</button>
+          <span class="mode-date-label" id="modeDateLabel"></span>
+          <button class="day-nav-btn hidden" id="dayNextBtn" type="button" aria-label="Sonraki gün">›</button>
+        </div>
+      </div>
+
+      <!-- Grafik Alanı -->
+      <div class="chart-wrap glass-card fade-in" id="chartWrap">
+        <div class="chart-skeleton" id="chartSkeleton">
+          <div class="skeleton-bar"></div>
+          <div class="skeleton-bar"></div>
+          <div class="skeleton-bar"></div>
+          <div class="skeleton-bar"></div>
+          <div class="skeleton-bar"></div>
+        </div>
+        <canvas id="chartCanvas" width="800" height="400" aria-label="Video yayın saatleri grafiği" role="img"></canvas>
+      </div>
+
+      <div class="export-row fade-in">
+        <button id="csvBtn" class="btn btn--ghost" type="button">CSV Olarak İndir</button>
+      </div>
+
+
+      <!-- Tooltip -->
+      <div class="chart-tooltip hidden" id="chartTooltip" role="tooltip">
+        <div class="tooltip-content" id="tooltipContent"></div>
+      </div>
+    </section>
+
+    <!-- ───── Yükleniyor Overlay ───── -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+      <div class="loading-card glass-card">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="loading-text">Veriler analiz ediliyor...</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
