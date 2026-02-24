@@ -109,7 +109,7 @@ const CalborUI = (() => {
   // her URL'i ayrı ayrı encode ederek ekle
   qp.set('urls', urls.map(u => encodeURIComponent(u)).join('|'));
 
-  els.previewAvatar.src = `/api/channel-avatar?${qp.toString()}`;
+  els.previewAvatar.src = `/api/channel-avatar?cid=${encodeURIComponent(channel.id)}`;
       
   els.previewAvatar.alt = channel.title;
   els.previewName.textContent = channel.title;
