@@ -1,0 +1,250 @@
+/* =========================
+   modals.css
+   - Modal altyapısı + animasyonlar
+   - Crop stage + guide overlay
+   - Slider / küçük kontrollerin stil uyumu
+   ========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  z-index:50;
+}
+
+.modal.is-open{
+  display:flex;
+}
+
+.modal__backdrop{
+  position:absolute; inset:0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn .18s ease both;
+}
+
+.modal__card{
+  position:relative;
+  width: min(860px, 100%);
+  border-radius: 22px;
+  border:1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  box-shadow: 0 30px 120px rgba(0,0,0,.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  overflow:hidden;
+  transform-origin: 50% 60%;
+  animation: popIn .22s cubic-bezier(.2,.9,.2,1.05) both;
+}
+
+.modal__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg, rgba(255,255,255,.08), transparent);
+}
+
+.modal__title{
+  font-weight:800;
+  letter-spacing:.2px;
+}
+
+.modal__body{
+  padding: 16px;
+}
+
+.modal__footer{
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,.06));
+}
+
+/* icon button */
+.iconBtn{
+  width:38px; height:38px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.88);
+  cursor:pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.iconBtn:hover{
+  background: rgba(255,255,255,.10);
+  transform: translateY(-1px);
+}
+.iconBtn:active{ transform: translateY(0px) scale(.98); }
+
+/* animations */
+@keyframes fadeIn{
+  from{ opacity:0; }
+  to{ opacity:1; }
+}
+
+@keyframes popIn{
+  from{
+    opacity:0;
+    transform: translateY(10px) scale(.96);
+    filter: blur(6px);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Crop stage */
+.cropStage{
+  position:relative;
+  width:100%;
+  height: 420px;
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(0,0,0,.25);
+  overflow:hidden;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+.cropStage__placeholder{
+  position:absolute; inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: rgba(255,255,255,.55);
+  font-size:13px;
+}
+
+/* Guide overlays (YouTube mantığı: TV / Desktop / Safe) */
+.guides{
+  position:absolute; inset:0;
+  pointer-events:none;
+}
+
+.guide{
+  position:absolute;
+  border:1px dashed rgba(255,255,255,.35);
+  color: rgba(255,255,255,.78);
+  font-size:12px;
+  padding:6px 8px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.guide--tv{
+  /* TV alanı en dar */
+  left:18%;
+  right:18%;
+  top:22%;
+  bottom:22%;
+}
+
+.guide--desktop{
+  /* Masaüstü alanı */
+  left:10%;
+  right:10%;
+  top:16%;
+  bottom:16%;
+  border-color: rgba(96,165,250,.45);
+}
+
+.guide--safe{
+  /* Tüm cihazlar safe area (metin/pp) */
+  left:30%;
+  right:30%;
+  top:34%;
+  bottom:34%;
+  border-color: rgba(34,211,238,.40);
+}
+
+/* Crop controls */
+.cropControls{
+  margin-top:14px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+
+.range{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width: min(420px, 100%);
+  padding:10px 12px;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+}
+.range span{
+  font-size:12.5px;
+  color: rgba(255,255,255,.78);
+  white-space:nowrap;
+}
+
+/* slider styling (uyumlu) */
+.range input[type="range"]{
+  width:100%;
+  appearance:none;
+  background: transparent;
+  outline:none;
+}
+
+.range input[type="range"]::-webkit-slider-runnable-track{
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.10);
+}
+.range input[type="range"]::-webkit-slider-thumb{
+  appearance:none;
+  width:18px; height:18px;
+  border-radius:999px;
+  background: rgba(96,165,250,.95);
+  border: 2px solid rgba(255,255,255,.70);
+  margin-top:-5px;
+  box-shadow: 0 10px 20px rgba(59,130,246,.25);
+  cursor:pointer;
+  transition: transform .15s ease;
+}
+.range input[type="range"]::-webkit-slider-thumb:hover{
+  transform: scale(1.06);
+}
+
+.range input[type="range"]::-moz-range-track{
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.10);
+}
+.range input[type="range"]::-moz-range-thumb{
+  width:18px; height:18px;
+  border-radius:999px;
+  background: rgba(96,165,250,.95);
+  border: 2px solid rgba(255,255,255,.70);
+  cursor:pointer;
+}
+
+/* modal small (video modal) */
+#videoModal .modal__card{
+  width: min(560px, 100%);
+}
+
+/* reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .modal__backdrop, .modal__card{
+    animation:none !important;
+  }
+}
