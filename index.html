@@ -1,247 +1,379 @@
 <!doctype html>
 <html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kassadillo</title>
-  <link rel="icon" type="image/png" href="favicon.png">
-
-  <!-- CSS (sıra önemli) -->
-  <link rel="stylesheet" href="./css/main.css" />
-  <link rel="stylesheet" href="./css/youtube-ui.css" />
-  <link rel="stylesheet" href="./css/modals.css" />
-</head>
-<body>
-
-  <div class="app">
-    <!-- SOL: Kontrol Paneli -->
-    <aside class="panel" aria-label="Kontrol Paneli">
-      <div class="panel__header">
-        <h1 class="panel__title">Kanal Ön İzleme</h1>
-        <p class="panel__subtitle">Soldan düzenle, sağda anlık gör</p>
-      </div>
-
-      <div class="panel__section">
-        <h2 class="panel__sectionTitle">Görseller</h2>
-
-        <label class="field">
-          <span class="field__label">Kanal Banner</span>
-          <input id="bannerInput" class="field__input" type="file" accept="image/*" />
-          <div class="field__hint">Öneri: 2048×1152</div>
-
-          <div class="inlineActions">
-            <button id="editBannerBtn" class="btn btn--secondary" type="button" disabled>Düzenle</button>
-            <button id="removeBannerBtn" class="btn btn--ghost" type="button" disabled>Kaldır</button>
-          </div>
-        </label>
-
-        <label class="field">
-          <span class="field__label">Profil Fotoğrafı (PP)</span>
-          <input id="ppInput" class="field__input" type="file" accept="image/png,image/jpeg,image/webp" />
-          <div class="field__hint">1:1 Boyutunda Görsel Yükleyiniz</div>
-          <div class="inlineActions">
-            <button id="removePpBtn" class="btn btn--ghost" type="button" disabled>Kaldır</button>
-          </div>
-        </label>
-      </div>
-
-      <div class="panel__section">
-        <h2 class="panel__sectionTitle">Metinler</h2>
-
-        <label class="field">
-          <span class="field__label">Kanal Adı</span>
-          <input id="channelNameInput" class="field__input" type="text" placeholder="Örn: My Channel" maxlength="50" />
-        </label>
-
-        <label class="field">
-          <span class="field__label">Kanal @handle</span>
-          <input id="handleInput" class="field__input" type="text" placeholder="@mychannel" />
-          <div id="handleError" class="field__error" aria-live="polite"></div>
-        </label>
-
-        <label class="field">
-          <span class="field__label">Abone Sayısı</span>
-          <input id="subsInput" class="field__input" type="text" placeholder="Örn: 3220" inputmode="numeric" />
-        </label>
-
-        <label class="field">
-          <span class="field__label">Kanal Açıklaması</span>
-          <textarea id="aboutInput" class="field__textarea" rows="3" maxlength="200" placeholder="Maksimum 85 karakter"></textarea>
-        </label>
-      </div>
-
-      <div class="panel__section">
-        <h2 class="panel__sectionTitle">Tema</h2>
-
-        <div class="toggleRow">
-          <button id="themeLightBtn" class="chip chip--active" type="button" data-theme="light">Aydınlık</button>
-          <button id="themeDarkBtn" class="chip" type="button" data-theme="dark">Karanlık</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Kanal Ön İzleme</title>
+    <meta name="theme-color" content="#050506" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Kanal Aracı" />
+    <meta name="msapplication-TileColor" content="#050506" />
+    <meta name="msapplication-config" content="/browserconfig.xml" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icons8-play-liquid-glass-16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icons8-play-liquid-glass-32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/icons8-play-liquid-glass-96.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/icons/icons8-play-liquid-glass-57.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/icons/icons8-play-liquid-glass-60.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/icons8-play-liquid-glass-72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/icons/icons8-play-liquid-glass-76.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/youtube-ui.css" />
+    <link rel="stylesheet" href="css/modals.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="control-panel" aria-label="Kontrol paneli">
+        <div class="panel-heading">
+          <p class="kicker">Kanal Ön İzleme</p>
+          <h1>YouTube Kanal Aracı</h1>
         </div>
 
-        <div class="field__hint">Sadece YouTube ön izleme panelini etkiler.</div>
-      </div>
-
-      <div class="panel__section">
-        <h2 class="panel__sectionTitle">Videolar</h2>
-
-        <button id="addVideoBtn" class="btn btn--primary" type="button">Video Ekle</button>
-        <div class="field__hint">Maksimum 8 video</div>
-
-        <div id="videoList" class="miniList" aria-label="Eklenen videolar"></div>
-      </div>
-
-      <div class="panel__footer">
-        <div class="muted">Not: A Va Nə Sü Sop Ba Ar...</div>
-      </div>
-    </aside>
-
-    <!-- SAĞ: 16:9 Ön İzleme -->
-    <main class="previewWrap" aria-label="YouTube Ön İzleme">
-      <div class="previewFrame">
-        <div id="ytPreview" class="yt yt--light" aria-hidden="true">
-          <!-- Üst bar (basit iskelet) -->
-          <div class="ytTopbar">
-            <div class="ytTopbar__left">
-              <div class="ytLogo"></div>
-            </div>
-            <div class="ytTopbar__center">
-              <div class="ytSearchBar"></div>
-            </div>
-            <div class="ytTopbar__right">
-              <div class="ytIcon"></div>
-              <div class="ytIcon"></div>
-              <div class="ytAvatarMini"></div>
-            </div>
+        <section class="control-section">
+          <div class="section-title">
+            <span>Görseller</span>
           </div>
 
-          <!-- Kanal sayfası -->
-          <div class="ytPage">
-            <!-- Banner -->
-            <div class="ytBanner">
-              <img id="bannerPreviewImg" class="ytBanner__img" alt="" />
-              <div class="ytBanner__fallback"></div>
-            </div>
+          <div class="upload-grid media-upload-grid">
+            <label class="upload-tile media-tile" id="bannerTile" for="bannerInput">
+              <span class="tile-preview banner-preview" id="bannerTilePreview" aria-hidden="true"></span>
+              <span class="tile-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4.8 5h14.4A2.8 2.8 0 0 1 22 7.8v8.4a2.8 2.8 0 0 1-2.8 2.8H4.8A2.8 2.8 0 0 1 2 16.2V7.8A2.8 2.8 0 0 1 4.8 5Zm0 1.8a1 1 0 0 0-1 1v8.4a1 1 0 0 0 1 1h14.4a1 1 0 0 0 1-1V7.8a1 1 0 0 0-1-1H4.8Zm1.4 8.55 3.1-3.1a1.2 1.2 0 0 1 1.7 0l1.15 1.15 2.2-2.2a1.2 1.2 0 0 1 1.7 0l2.75 2.75v1.25H6.2v-1.85Z" />
+                </svg>
+              </span>
+              <span class="tile-text">
+                <strong>Kanal banner'ı</strong>
+              </span>
+              <input id="bannerInput" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            </label>
 
-            <!-- Kanal başlığı -->
-            <div class="ytHeader">
-              <div class="ytHeader__pp">
-                <img id="ppPreviewImg" class="ytPp" alt="" />
-                <div class="ytPp__fallback"></div>
+            <label class="upload-tile media-tile" id="avatarTile" for="avatarInput">
+              <span class="tile-preview avatar-preview" id="avatarTilePreview" aria-hidden="true"></span>
+              <span class="tile-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 12.2a4.6 4.6 0 1 0 0-9.2 4.6 4.6 0 0 0 0 9.2Zm0-7.4a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6ZM4 20.1c0-4.25 3.5-6.5 8-6.5s8 2.25 8 6.5a.9.9 0 0 1-1.8 0c0-3-2.5-4.7-6.2-4.7s-6.2 1.7-6.2 4.7a.9.9 0 0 1-1.8 0Z" />
+                </svg>
+              </span>
+              <span class="tile-text">
+                <strong>Profil fotoğrafı</strong>
+              </span>
+              <input id="avatarInput" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+            </label>
+          </div>
+        </section>
+
+        <section class="control-section compact-section">
+          <div class="section-title">
+            <span>Görünürlük</span>
+          </div>
+          <div class="toggle-grid">
+            <button class="toggle-chip is-active" id="toggleShorts" type="button" data-section="shorts">Shorts</button>
+            <button class="toggle-chip is-active" id="togglePlaylists" type="button" data-section="playlists">Oynatma Listeleri</button>
+            <button class="toggle-chip is-active" id="togglePosts" type="button" data-section="posts">Gönderiler</button>
+            <button class="toggle-chip is-active" id="toggleLive" type="button" data-section="live">Canlı</button>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <div class="section-title">
+            <span>Kanal Bilgileri</span>
+          </div>
+
+          <label class="field">
+            <span>Kanal adı</span>
+            <input id="channelName" type="text" maxlength="60" autocomplete="off" placeholder="Örn. Kanalım" />
+          </label>
+
+          <label class="field">
+            <span>Kanal @handle</span>
+            <input id="channelHandle" type="text" maxlength="31" autocomplete="off" placeholder="@kanalim" />
+            <small id="handleError" class="field-error" hidden>Herkese açık kullanıcı adı desteklenmeyen karakterler içeriyor</small>
+          </label>
+
+          <label class="field">
+            <span>Abone sayısı</span>
+            <input id="subscriberCount" class="no-spinner" type="number" min="0" step="1" inputmode="numeric" placeholder="Örn. 10000" />
+          </label>
+
+          <label class="field">
+            <span>Kanal açıklaması</span>
+            <textarea id="channelDescription" maxlength="120" rows="2" placeholder="Örn. Kanalıma Hoş Geldiniz!"></textarea>
+            <small><span id="descCount">0</span>/120</small>
+          </label>
+        </section>
+
+        <section class="control-section video-section">
+          <div class="section-title">
+            <span>Videolar</span>
+            <small><span id="videoCount">0</span>/8</small>
+          </div>
+          <button class="primary-button" id="openVideoPanel" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M11.1 5a.9.9 0 0 1 1.8 0v6.1H19a.9.9 0 0 1 0 1.8h-6.1V19a.9.9 0 0 1-1.8 0v-6.1H5a.9.9 0 0 1 0-1.8h6.1V5Z" />
+            </svg>
+            Video Ekle
+          </button>
+          <div class="video-list" id="videoList"></div>
+        </section>
+      </aside>
+
+      <section class="preview-workspace" aria-label="YouTube kanal ön izlemesi">
+        <div class="device-stage" id="deviceStage">
+          <div class="youtube-screen is-desktop theme-dark" id="youtubeScreen">
+            <div class="yt-topbar">
+              <div class="yt-mobile-channel" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M15.7 5.7a1 1 0 0 1 0 1.4L10.8 12l4.9 4.9a1 1 0 1 1-1.4 1.4l-5.6-5.6a1 1 0 0 1 0-1.4l5.6-5.6a1 1 0 0 1 1.4 0Z" />
+                </svg>
+                <span id="previewMobileName"></span>
               </div>
 
-              <div class="ytHeader__meta">
-                <div id="channelNamePreview" class="ytChannelName">Kanal Adı</div>
-                <div class="ytHandleRow">
-                  <span id="handlePreview" class="ytHandle">@handle</span>
-                  <span class="ytDot">•</span>
-                  <span id="subsPreview" class="ytSubs">0 abone</span>
+              <div class="yt-logo" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" id="yt-ringo2-svg" width="93" height="20" viewBox="0 0 93 20" focusable="false" aria-hidden="true">
+                  <g>
+                    <path d="M14.4848 20C14.4848 20 23.5695 20 25.8229 19.4C27.0917 19.06 28.0459 18.08 28.3808 16.87C29 14.65 29 9.98 29 9.98C29 9.98 29 5.34 28.3808 3.14C28.0459 1.9 27.0917 0.94 25.8229 0.61C23.5695 0 14.4848 0 14.4848 0C14.4848 0 5.42037 0 3.17711 0.61C1.9286 0.94 0.954148 1.9 0.59888 3.14C0 5.34 0 9.98 0 9.98C0 9.98 0 14.65 0.59888 16.87C0.954148 18.08 1.9286 19.06 3.17711 19.4C5.42037 20 14.4848 20 14.4848 20Z" fill="#FF0033"></path>
+                    <path d="M19 10L11.5 5.75V14.25L19 10Z" fill="white"></path>
+                  </g>
+                  <g id="youtube-paths">
+                    <path d="M37.1384 18.8999V13.4399L40.6084 2.09994H38.0184L36.6984 7.24994C36.3984 8.42994 36.1284 9.65994 35.9284 10.7999H35.7684C35.6584 9.79994 35.3384 8.48994 35.0184 7.22994L33.7384 2.09994H31.1484L34.5684 13.4399V18.8999H37.1384Z"></path>
+                    <path d="M44.1003 6.29994C41.0703 6.29994 40.0303 8.04994 40.0303 11.8199V13.6099C40.0303 16.9899 40.6803 19.1099 44.0403 19.1099C47.3503 19.1099 48.0603 17.0899 48.0603 13.6099V11.8199C48.0603 8.44994 47.3803 6.29994 44.1003 6.29994ZM45.3903 14.7199C45.3903 16.3599 45.1003 17.3899 44.0503 17.3899C43.0203 17.3899 42.7303 16.3499 42.7303 14.7199V10.6799C42.7303 9.27994 42.9303 8.02994 44.0503 8.02994C45.2303 8.02994 45.3903 9.34994 45.3903 10.6799V14.7199Z"></path>
+                    <path d="M52.2713 19.0899C53.7313 19.0899 54.6413 18.4799 55.3913 17.3799H55.5013L55.6113 18.8999H57.6012V6.53994H54.9613V16.4699C54.6812 16.9599 54.0312 17.3199 53.4212 17.3199C52.6512 17.3199 52.4113 16.7099 52.4113 15.6899V6.53994H49.7812V15.8099C49.7812 17.8199 50.3613 19.0899 52.2713 19.0899Z"></path>
+                    <path d="M62.8261 18.8999V4.14994H65.8661V2.09994H57.1761V4.14994H60.2161V18.8999H62.8261Z"></path>
+                    <path d="M67.8728 19.0899C69.3328 19.0899 70.2428 18.4799 70.9928 17.3799H71.1028L71.2128 18.8999H73.2028V6.53994H70.5628V16.4699C70.2828 16.9599 69.6328 17.3199 69.0228 17.3199C68.2528 17.3199 68.0128 16.7099 68.0128 15.6899V6.53994H65.3828V15.8099C65.3828 17.8199 65.9628 19.0899 67.8728 19.0899Z"></path>
+                    <path d="M80.6744 6.26994C79.3944 6.26994 78.4744 6.82994 77.8644 7.73994H77.7344C77.8144 6.53994 77.8744 5.51994 77.8744 4.70994V1.43994H75.3244L75.3144 12.1799L75.3244 18.8999H77.5444L77.7344 17.6999H77.8044C78.3944 18.5099 79.3044 19.0199 80.5144 19.0199C82.5244 19.0199 83.3844 17.2899 83.3844 13.6099V11.6999C83.3844 8.25994 82.9944 6.26994 80.6744 6.26994ZM80.7644 13.6099C80.7644 15.9099 80.4244 17.2799 79.3544 17.2799C78.8544 17.2799 78.1644 17.0399 77.8544 16.5899V9.23994C78.1244 8.53994 78.7244 8.02994 79.3944 8.02994C80.4744 8.02994 80.7644 9.33994 80.7644 11.7299V13.6099Z"></path>
+                    <path d="M92.6517 11.4999C92.6517 8.51994 92.3517 6.30994 88.9217 6.30994C85.6917 6.30994 84.9717 8.45994 84.9717 11.6199V13.7899C84.9717 16.8699 85.6317 19.1099 88.8417 19.1099C91.3817 19.1099 92.6917 17.8399 92.5417 15.3799L90.2917 15.2599C90.2617 16.7799 89.9117 17.3999 88.9017 17.3999C87.6317 17.3999 87.5717 16.1899 87.5717 14.3899V13.5499H92.6517V11.4999ZM88.8617 7.96994C90.0817 7.96994 90.1717 9.11994 90.1717 11.0699V12.0799H87.5717V11.0699C87.5717 9.13994 87.6517 7.96994 88.8617 7.96994Z"></path>
+                  </g>
+                </svg>
+              </div>
+
+              <div class="yt-search" aria-hidden="true">
+                <span>Ara</span>
+                <svg viewBox="0 0 24 24">
+                  <path d="M11 4a7 7 0 1 0 4.34 12.5l3.58 3.58a.9.9 0 1 0 1.27-1.27l-3.58-3.58A7 7 0 0 0 11 4Zm0 1.8a5.2 5.2 0 1 1 0 10.4 5.2 5.2 0 0 1 0-10.4Z" />
+                </svg>
+              </div>
+
+              <div class="yt-actions" aria-hidden="true">
+                <span class="desktop-action-dot"></span>
+                <span class="desktop-action-dot"></span>
+                <span class="desktop-action-dot"></span>
+                <svg class="mobile-cast-icon" viewBox="0 0 24 24">
+                  <path d="M3 6.4A2.4 2.4 0 0 1 5.4 4h13.2A2.4 2.4 0 0 1 21 6.4v8.2a2.4 2.4 0 0 1-2.4 2.4h-2.1v-1.8h2.1a.6.6 0 0 0 .6-.6V6.4a.6.6 0 0 0-.6-.6H5.4a.6.6 0 0 0-.6.6v1.7H3V6.4Zm0 8.2a6.4 6.4 0 0 1 6.4 6.4H7.6A4.6 4.6 0 0 0 3 16.4v-1.8Zm0-4.1A10.5 10.5 0 0 1 13.5 21h-1.8A8.7 8.7 0 0 0 3 12.3v-1.8Zm0 8.1A2.4 2.4 0 0 1 5.4 21H3v-2.4Z" />
+                </svg>
+                <svg class="mobile-more-icon" viewBox="0 0 24 24">
+                  <path d="M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="yt-page">
+              <div class="channel-wrap">
+                <div class="channel-banner" id="previewBanner"></div>
+
+                <div class="channel-header">
+                  <div class="channel-avatar" id="previewAvatar"></div>
+                  <div class="channel-copy">
+                    <h2 id="previewName"></h2>
+                    <div class="channel-meta">
+                      <strong id="previewHandle"></strong>
+                      <span class="dot" id="metaDotHandleSubs"></span>
+                      <span id="previewSubs"></span>
+                      <span class="dot" id="metaDotSubsVideos"></span>
+                      <span id="previewVideoTotal">0 video</span>
+                    </div>
+                    <p id="previewDescription"></p>
+                    <span class="mobile-channel-link" id="previewMobileLink"></span>
+                    <button class="subscribe-pill" type="button" tabindex="-1">Abone ol</button>
+                  </div>
                 </div>
 
-                <div id="aboutPreview" class="ytAbout">Kanal açıklaması burada görünecek.</div>
-              </div>
+                <div class="channel-tabs">
+                  <span>Ana Sayfa</span>
+                  <span class="active">Videolar</span>
+                  <span class="tab-shorts">Shorts</span>
+                  <span class="tab-live">Canlı</span>
+                  <span class="tab-playlists">Oynatma listeleri</span>
+                  <span class="tab-posts">Gönderiler</span>
+                  <span class="tab-search" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M11 4a7 7 0 1 0 4.34 12.5l3.58 3.58a.9.9 0 1 0 1.27-1.27l-3.58-3.58A7 7 0 0 0 11 4Zm0 1.8a5.2 5.2 0 1 1 0 10.4 5.2 5.2 0 0 1 0-10.4Z" />
+                    </svg>
+                  </span>
+                </div>
 
-              <div class="ytHeader__actions">
-                <div class="ytBtn ytBtn--ghost">Abone ol</div>
+                <div class="mobile-filter-row" aria-hidden="true">
+                  <span class="active">En yeni</span>
+                  <span>Popüler</span>
+                  <span>En eski</span>
+                </div>
+
+                <div class="videos-grid" id="previewVideos"></div>
               </div>
             </div>
-
-            <!-- Sekmeler -->
-            <div class="ytTabs">
-              <div class="ytTab ytTab--active">Ana sayfa</div>
-              <div class="ytTab">Videolar</div>
-              <div class="ytTab">Oynatma listeleri</div>
-              <div class="ytTab">Topluluk</div>
-            </div>
-
-            <!-- Video grid -->
-            <div class="ytSectionTitle">Yüklenenler</div>
-            <div id="videoGrid" class="ytGrid"></div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <aside class="tool-rail" aria-label="Ön izleme ayarları">
+        <button class="rail-button is-active" id="desktopMode" type="button" title="PC">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4.8 4h14.4A2.8 2.8 0 0 1 22 6.8v8.4a2.8 2.8 0 0 1-2.8 2.8h-4.3v1.2H18a.9.9 0 1 1 0 1.8H6a.9.9 0 1 1 0-1.8h3.1V18H4.8A2.8 2.8 0 0 1 2 15.2V6.8A2.8 2.8 0 0 1 4.8 4Zm0 1.8a1 1 0 0 0-1 1v8.4a1 1 0 0 0 1 1h14.4a1 1 0 0 0 1-1V6.8a1 1 0 0 0-1-1H4.8Z" />
+          </svg>
+        </button>
+        <button class="rail-button" id="mobileMode" type="button" title="Telefon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 2.5h8A2.5 2.5 0 0 1 18.5 5v14A2.5 2.5 0 0 1 16 21.5H8A2.5 2.5 0 0 1 5.5 19V5A2.5 2.5 0 0 1 8 2.5Zm0 1.8a.7.7 0 0 0-.7.7v14a.7.7 0 0 0 .7.7h8a.7.7 0 0 0 .7-.7V5a.7.7 0 0 0-.7-.7H8Zm2.5 12.8h3a.9.9 0 0 1 0 1.8h-3a.9.9 0 1 1 0-1.8Z" />
+          </svg>
+        </button>
+        <span class="rail-separator"></span>
+        <button class="rail-button" id="lightTheme" type="button" title="Beyaz mod">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5.2a6.8 6.8 0 1 1 0 13.6 6.8 6.8 0 0 1 0-13.6Zm0 1.8a5 5 0 1 0 0 10 5 5 0 0 0 0-10ZM12 1.7a.9.9 0 0 1 .9.9v1a.9.9 0 0 1-1.8 0v-1a.9.9 0 0 1 .9-.9Zm0 17.8a.9.9 0 0 1 .9.9v1a.9.9 0 1 1-1.8 0v-1a.9.9 0 0 1 .9-.9ZM3.1 11.1h1a.9.9 0 1 1 0 1.8h-1a.9.9 0 1 1 0-1.8Zm16.8 0h1a.9.9 0 1 1 0 1.8h-1a.9.9 0 1 1 0-1.8Z" />
+          </svg>
+        </button>
+        <button class="rail-button is-active" id="darkTheme" type="button" title="Karanlık mod">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 14.35a.9.9 0 0 1 .95 1.2A9.5 9.5 0 1 1 8.45 3.05.9.9 0 0 1 9.65 4 7.2 7.2 0 0 0 20 14.35ZM7.68 5.38A7.7 7.7 0 1 0 18.62 16.3 9 9 0 0 1 7.68 5.38Z" />
+          </svg>
+        </button>
+        <button class="rail-button" id="copyPreviewButton" type="button" title="Ön izlemeyi kopyala" aria-label="Ön izlemeyi kopyala">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8.2 5.2 9.55 3.5h4.9l1.35 1.7h2.9A2.3 2.3 0 0 1 21 7.5v9A2.3 2.3 0 0 1 18.7 18.8H5.3A2.3 2.3 0 0 1 3 16.5v-9a2.3 2.3 0 0 1 2.3-2.3h2.9Zm.86 1.8H5.3a.5.5 0 0 0-.5.5v9c0 .28.22.5.5.5h13.4a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-3.76l-1.35-1.7h-3.18L9.06 7ZM12 8.1a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 1.8a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z" />
+          </svg>
+        </button>
+        <span class="rail-separator rail-separator-bottom"></span>
+        <button class="rail-button feedback-rail-button" id="openFeedbackPanel" type="button" title="Yorum bildir" aria-label="Yorum bildir">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5.2 4h13.6A2.2 2.2 0 0 1 21 6.2v8.1a2.2 2.2 0 0 1-2.2 2.2h-4.45l-4.48 3.17a.9.9 0 0 1-1.42-.73V16.5H5.2A2.2 2.2 0 0 1 3 14.3V6.2A2.2 2.2 0 0 1 5.2 4Zm0 1.8a.4.4 0 0 0-.4.4v8.1c0 .22.18.4.4.4h4.15a.9.9 0 0 1 .9.9v1.6l3.28-2.32a.9.9 0 0 1 .52-.17h4.75a.4.4 0 0 0 .4-.4V6.2a.4.4 0 0 0-.4-.4H5.2Zm2.5 3.1h8.6a.85.85 0 1 1 0 1.7H7.7a.85.85 0 1 1 0-1.7Zm0 3.2h5.6a.85.85 0 1 1 0 1.7H7.7a.85.85 0 1 1 0-1.7Z" />
+          </svg>
+        </button>
+      </aside>
     </main>
-  </div>
 
-  <!-- MODAL: Banner kırpma/konumlandırma -->
-  <div id="bannerModal" class="modal" aria-hidden="true">
-    <div class="modal__backdrop" data-close="bannerModal"></div>
-    <div class="modal__card" role="dialog" aria-modal="true" aria-label="Banner Düzenle">
-      <div class="modal__header">
-        <div class="modal__title">Banner Düzenle</div>
-        <button class="iconBtn" type="button" data-close="bannerModal" aria-label="Kapat">✕</button>
+    <div class="feedback-panel" id="feedbackPanel" hidden>
+      <form class="panel-card feedback-card" id="feedbackForm" novalidate>
+        <div class="floating-head">
+          <strong>Yapımcıya not düş</strong>
+          <button class="icon-button" id="closeFeedbackPanel" type="button" title="Kapat">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m12 10.73 4.06-4.06a.9.9 0 1 1 1.27 1.27L13.27 12l4.06 4.06a.9.9 0 0 1-1.27 1.27L12 13.27l-4.06 4.06a.9.9 0 0 1-1.27-1.27L10.73 12 6.67 7.94a.9.9 0 0 1 1.27-1.27L12 10.73Z" />
+            </svg>
+          </button>
+        </div>
+        <label class="field">
+          <span>İsim</span>
+          <input id="feedbackName" type="text" maxlength="80" autocomplete="name" required placeholder="ismini yaz bakim" />
+        </label>
+        <label class="field">
+          <span>Not</span>
+          <textarea id="feedbackMessage" maxlength="1200" rows="5" placeholder="Bug, öneri veya bana olan notlarını yaz."></textarea>
+        </label>
+        <small class="feedback-status" id="feedbackStatus" hidden></small>
+        <button class="primary-button feedback-submit" id="submitFeedback" type="submit">
+          <span class="button-label">Gönder</span>
+          <span class="button-spinner" aria-hidden="true"></span>
+        </button>
+      </form>
+    </div>
+
+    <div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="video-panel" id="videoPanel" hidden>
+      <div class="panel-card">
+        <div class="floating-head">
+          <strong id="videoPanelTitle">Video Ekle</strong>
+          <button class="icon-button" id="closeVideoPanel" type="button" title="Kapat">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m12 10.73 4.06-4.06a.9.9 0 1 1 1.27 1.27L13.27 12l4.06 4.06a.9.9 0 0 1-1.27 1.27L12 13.27l-4.06 4.06a.9.9 0 0 1-1.27-1.27L10.73 12 6.67 7.94a.9.9 0 0 1 1.27-1.27L12 10.73Z" />
+            </svg>
+          </button>
+        </div>
+        <div class="thumb-preview-frame" id="thumbPreviewFrame" hidden>
+          <span id="thumbPreview" aria-hidden="true"></span>
+        </div>
+        <label class="upload-tile full thumbnail-picker" for="thumbInput">
+          <span class="tile-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4.8 5h14.4A2.8 2.8 0 0 1 22 7.8v8.4a2.8 2.8 0 0 1-2.8 2.8H4.8A2.8 2.8 0 0 1 2 16.2V7.8A2.8 2.8 0 0 1 4.8 5Zm0 1.8a1 1 0 0 0-1 1v8.4a1 1 0 0 0 1 1h14.4a1 1 0 0 0 1-1V7.8a1 1 0 0 0-1-1H4.8Zm5.35 2.55 4.9 2.65-4.9 2.65v-5.3Z" />
+            </svg>
+          </span>
+          <span class="tile-text">
+            <strong>Thumbnail</strong>
+          </span>
+          <input id="thumbInput" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+        </label>
+        <label class="field">
+          <span>Video başlığı</span>
+          <input id="videoTitle" type="text" maxlength="90" autocomplete="off" placeholder="Videonuzun başlığını girin" />
+        </label>
+        <label class="field">
+          <span>İzlenme sayısı</span>
+          <input id="videoViews" class="no-spinner" type="number" min="0" step="1" inputmode="numeric" placeholder="Örn. 67000" />
+        </label>
+        <label class="field">
+          <span>Video süresi</span>
+          <input id="videoDuration" class="no-spinner" type="text" inputmode="numeric" placeholder="Örn. 15:00" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>Kaç gün önce yüklendi</span>
+          <input id="videoAgeDays" class="no-spinner" type="number" min="0" step="1" inputmode="numeric" placeholder="Örn. 12" />
+        </label>
+        <button class="primary-button" id="saveVideo" type="button">Ekle</button>
       </div>
+    </div>
 
-      <div class="modal__body">
-        <div class="cropStage">
-          <!-- Buraya cropper / canvas gelecek -->
-          <div class="cropStage__placeholder">
-            Banner yüklendiğinde burada kırpma arayüzü açılacak.
+    <div class="modal-backdrop" id="cropModal" hidden>
+      <section class="crop-dialog" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+        <div class="crop-head">
+          <div>
+            <p class="kicker">Banner</p>
+            <h2 id="cropTitle">Banner resmini özelleştirin</h2>
           </div>
-
-          <!-- Kılavuz katmanları (şimdilik iskelet) -->
-          <div class="guides">
-            <div class="guide guide--tv">TV’de görüntülenebilir</div>
-            <div class="guide guide--desktop">Masaüstünde görüntülenebilir</div>
-            <div class="guide guide--safe">Tüm cihazlarda görüntülenebilir (Safe Area)</div>
-          </div>
+          <button class="icon-button" id="closeCrop" type="button" title="Kapat">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m12 10.73 4.06-4.06a.9.9 0 1 1 1.27 1.27L13.27 12l4.06 4.06a.9.9 0 0 1-1.27 1.27L12 13.27l-4.06 4.06a.9.9 0 0 1-1.27-1.27L10.73 12 6.67 7.94a.9.9 0 0 1 1.27-1.27L12 10.73Z" />
+            </svg>
+          </button>
         </div>
 
-        <div class="cropControls">
-          <label class="range">
+        <div class="crop-warning">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm0 1.8a8.2 8.2 0 1 0 0 16.4 8.2 8.2 0 0 0 0-16.4Zm0 4.2a1.1 1.1 0 1 1 0 2.2A1.1 1.1 0 0 1 12 8Zm.9 8h-1.8v-4.6h1.8V16Z" />
+          </svg>
+          <span>En iyi sonuç için en az 2560 x 1440 piksel çözünürlüğünde bir resim kullanın.</span>
+        </div>
+
+        <div class="crop-stage" id="cropStage">
+          <img id="cropImage" alt="" draggable="false" />
+          <div class="guide guide-tv">
+            <span>TV'de görüntülenebilir</span>
+          </div>
+          <div class="guide guide-desktop">
+            <span>Masaüstünde görüntülenebilir</span>
+          </div>
+          <div class="guide guide-safe">
+            <span>Tüm cihazlarda görüntülenebilir</span>
+          </div>
+          <span class="crop-corner top-left"></span>
+          <span class="crop-corner top-right"></span>
+          <span class="crop-corner bottom-left"></span>
+          <span class="crop-corner bottom-right"></span>
+        </div>
+
+        <div class="crop-controls">
+          <label class="zoom-field">
             <span>Yakınlaştır</span>
-            <input id="bannerZoom" type="range" min="1" max="3" step="0.01" value="1" />
+            <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1" />
           </label>
+          <div class="crop-actions">
+            <button class="ghost-button" id="cancelCrop" type="button">Vazgeç</button>
+            <button class="primary-button" id="saveCrop" type="button">Bitti</button>
+          </div>
         </div>
-      </div>
-
-      <div class="modal__footer">
-        <button class="btn btn--secondary" type="button" data-close="bannerModal">İptal</button>
-        <button id="saveBannerBtn" class="btn btn--primary" type="button">Bitti</button>
-      </div>
+      </section>
     </div>
-  </div>
 
-  <!-- MODAL: Video ekleme -->
-  <div id="videoModal" class="modal" aria-hidden="true">
-    <div class="modal__backdrop" data-close="videoModal"></div>
-    <div class="modal__card" role="dialog" aria-modal="true" aria-label="Video Ekle">
-      <div class="modal__header">
-        <div class="modal__title">Video Ekle</div>
-        <button class="iconBtn" type="button" data-close="videoModal" aria-label="Kapat">✕</button>
-      </div>
-
-      <div class="modal__body">
-        <label class="field">
-          <span class="field__label">Thumbnail</span>
-          <input id="thumbInput" class="field__input" type="file" accept="image/*" />
-        </label>
-
-        <label class="field">
-          <span class="field__label">Video Başlığı</span>
-          <input id="videoTitleInput" class="field__input" type="text" maxlength="100" placeholder="Örn: Yeni video!" />
-        </label>
-
-        <label class="field">
-          <span class="field__label">İzlenme Sayısı</span>
-          <input id="viewsInput" class="field__input" type="text" placeholder="Örn: 12500" inputmode="numeric" />
-        </label>
-
-        <label class="field">
-          <span class="field__label">Yükleme Zamanı</span>
-          <input id="timeAgoInput" class="field__input" type="text" maxlength="30" placeholder="Örn: 2 gün önce" />
-        </label>
-      </div>
-
-      <div class="modal__footer">
-        <button class="btn btn--secondary" type="button" data-close="videoModal">İptal</button>
-        <button id="saveVideoBtn" class="btn btn--primary" type="button">Ekle</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JS (sıra önemli) -->
-  <script src="./js/ui-manager.js"></script>
-  <script src="./js/cropper-logic.js"></script>
-  <script src="./js/video-system.js"></script>
-</body>
+    <script type="module" src="js/app.js?v=20260527b"></script>
+  </body>
 </html>

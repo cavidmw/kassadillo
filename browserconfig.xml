@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square70x70logo src="/icons/icons8-play-liquid-glass-70.png"/>
+      <TileColor>#050506</TileColor>
+    </tile>
+  </msapplication>
+</browserconfig>

@@ -1,0 +1,36 @@
+{
+  "name": "YouTube Kanal Aracı",
+  "short_name": "Kanal Aracı",
+  "description": "YouTube kanal görsellerini yayınlamadan önce ön izlemek için modern araç.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#030406",
+  "theme_color": "#050506",
+  "icons": [
+    {
+      "src": "/icons/icons8-play-liquid-glass-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icons8-play-liquid-glass-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
