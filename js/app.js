@@ -1,7 +1,7 @@
 import { $, createSvgIcon, formatCount, normalizeHandle, previewDescription, readImageFile } from "./utils.js";
 import { BannerCropper } from "./cropper.js";
 import { initFeedback, showToast } from "./feedback.js";
-import { copyPreviewToClipboard } from "./preview-capture.js";
+import { createPreviewClone } from "./preview-capture.js";
 
 const state = {
   avatar: "",
@@ -17,6 +17,7 @@ const state = {
     posts: true,
     live: true,
   },
+  verified: true,
 };
 
 const elements = {
@@ -37,6 +38,7 @@ const elements = {
   previewBanner: $("#previewBanner"),
   previewAvatar: $("#previewAvatar"),
   previewName: $("#previewName"),
+  previewVerifiedBadge: $("#previewVerifiedBadge"),
   previewMobileName: $("#previewMobileName"),
   previewHandle: $("#previewHandle"),
   previewSubs: $("#previewSubs"),
@@ -64,11 +66,14 @@ const elements = {
   mobileMode: $("#mobileMode"),
   lightTheme: $("#lightTheme"),
   darkTheme: $("#darkTheme"),
-  copyPreviewButton: $("#copyPreviewButton"),
+  showPreviewButton: $("#showPreviewButton"),
+  previewLightbox: $("#previewLightbox"),
+  previewLightboxMount: $("#previewLightboxMount"),
   toggleShorts: $("#toggleShorts"),
   togglePlaylists: $("#togglePlaylists"),
   togglePosts: $("#togglePosts"),
   toggleLive: $("#toggleLive"),
+  toggleVerified: $("#toggleVerified"),
   openFeedbackPanel: $("#openFeedbackPanel"),
   feedbackPanel: $("#feedbackPanel"),
   feedbackForm: $("#feedbackForm"),
@@ -128,8 +133,7 @@ function renderChannelInfo() {
   const name = elements.nameInput.value.trim();
   const handle = normalizeHandle(elements.handleInput.value);
   const subsValue = elements.subsInput.value.trim();
-  const descLimit = elements.screen.classList.contains("is-mobile") ? 110 : 25;
-  const desc = previewDescription(elements.descInput.value, descLimit);
+  const desc = previewDescription(elements.descInput.value, 70, "...devamı");
   const visibleDescLength = elements.descInput.value.trim().length;
 
   elements.previewName.textContent = name;
@@ -137,9 +141,18 @@ function renderChannelInfo() {
   elements.previewHandle.textContent = handle.display;
   elements.previewSubs.textContent = subsValue ? `${formatCount(subsValue)} abone` : "";
   elements.previewVideoTotal.textContent = `${state.videos.length} video`;
-  elements.previewDescription.textContent = desc.text;
+  elements.previewDescription.replaceChildren(document.createTextNode(desc.text));
+  if (desc.truncated) {
+    const more = document.createElement("span");
+    more.className = "desc-more";
+    more.textContent = desc.suffix;
+    elements.previewDescription.append(more);
+  }
   elements.previewDescription.classList.toggle("is-truncated", desc.truncated);
   elements.previewMobileLink.textContent = handle.valid && handle.display ? `youtube.com/${handle.display}` : "";
+  elements.previewVerifiedBadge.classList.toggle("is-hidden", !state.verified);
+  elements.toggleVerified.classList.toggle("is-active", state.verified);
+  elements.toggleVerified.setAttribute("aria-pressed", String(state.verified));
   elements.descCount.textContent = visibleDescLength;
 
   const hasHandle = Boolean(handle.display);
@@ -441,6 +454,44 @@ function fitDevice() {
   elements.screen.style.transform = "translate(-50%, -50%)";
 }
 
+function openPreviewLightbox() {
+  elements.previewLightbox.classList.toggle("is-mobile-preview", elements.screen.classList.contains("is-mobile"));
+  elements.previewLightbox.hidden = false;
+  fitLightboxPreview();
+  elements.previewLightbox.offsetHeight;
+  elements.previewLightbox.classList.add("is-open");
+}
+
+function closePreviewLightbox() {
+  if (elements.previewLightbox.hidden || elements.previewLightbox.classList.contains("is-closing")) return;
+  elements.previewLightbox.classList.remove("is-open");
+  elements.previewLightbox.classList.add("is-closing");
+  window.setTimeout(() => {
+    elements.previewLightbox.hidden = true;
+    elements.previewLightbox.classList.remove("is-closing", "is-mobile-preview");
+    elements.previewLightboxMount.replaceChildren();
+  }, 220);
+}
+
+function fitLightboxPreview() {
+  const clone = elements.previewLightboxMount.querySelector(".lightbox-preview-clone");
+  if (!clone) return;
+
+  const isMobilePreview = clone.classList.contains("is-mobile");
+  const width = isMobilePreview ? 430 : 1280;
+  const height = isMobilePreview ? 932 : Math.max(780, elements.screen.scrollHeight || 780);
+  const maxWidth = window.innerWidth - (isMobilePreview ? 80 : 96);
+  const maxHeight = window.innerHeight - (isMobilePreview ? 80 : 96);
+  const scale = Math.min(1, maxWidth / width, maxHeight / height);
+
+  clone.style.width = `${width}px`;
+  clone.style.height = `${height}px`;
+  clone.style.minHeight = `${height}px`;
+  clone.style.zoom = String(Math.max(0.2, scale));
+  elements.previewLightboxMount.style.width = `${width * Math.max(0.2, scale)}px`;
+  elements.previewLightboxMount.style.height = `${height * Math.max(0.2, scale)}px`;
+}
+
 function bindEvents() {
   [elements.nameInput, elements.handleInput, elements.subsInput, elements.descInput].forEach((input) => {
     input.addEventListener("input", renderChannelInfo);
@@ -500,21 +551,35 @@ function bindEvents() {
     });
   });
 
+  elements.toggleVerified.addEventListener("click", () => {
+    state.verified = !state.verified;
+    renderChannelInfo();
+  });
+
   elements.desktopMode.addEventListener("click", () => setDevice("desktop"));
   elements.mobileMode.addEventListener("click", () => setDevice("mobile"));
   elements.lightTheme.addEventListener("click", () => setTheme("light"));
   elements.darkTheme.addEventListener("click", () => setTheme("dark"));
-  elements.copyPreviewButton.addEventListener("click", async () => {
+  elements.showPreviewButton.addEventListener("click", async () => {
     try {
-      elements.copyPreviewButton.disabled = true;
-      await copyPreviewToClipboard(elements.screen);
-      showToast(elements.toastHost, "Ön izleme panoya kopyalandı.");
+      elements.showPreviewButton.disabled = true;
+      elements.previewLightboxMount.replaceChildren(createPreviewClone(elements.screen));
+      openPreviewLightbox();
     } catch (error) {
       console.error(error);
-      window.__lastCopyError = error instanceof Error && error.message ? error.message : "Clipboard işlemi tarayıcı tarafından engellendi.";
-      showToast(elements.toastHost, "Ön izleme kopyalanamadı.", "error");
+      showToast(elements.toastHost, "Önizleme gösterilemedi.", "error");
     } finally {
-      elements.copyPreviewButton.disabled = false;
+      elements.showPreviewButton.disabled = false;
+    }
+  });
+  elements.previewLightbox.addEventListener("click", (event) => {
+    if (event.target === elements.previewLightbox) {
+      closePreviewLightbox();
+    }
+  });
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closePreviewLightbox();
     }
   });
   initFeedback({
@@ -529,6 +594,7 @@ function bindEvents() {
     toastHost: elements.toastHost,
   });
   window.addEventListener("resize", fitDevice);
+  window.addEventListener("resize", fitLightboxPreview);
 }
 
 bindEvents();

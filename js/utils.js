@@ -28,9 +28,9 @@ export function loadImage(src) {
 export function formatCount(value) {
   const count = Math.max(0, Number.parseInt(value || 0, 10) || 0);
   const units = [
-    { min: 1_000_000_000, suffix: "Mr" },
-    { min: 1_000_000, suffix: "Mn" },
-    { min: 1_000, suffix: "B" },
+    { min: 1_000_000_000, suffix: " Mr" },
+    { min: 1_000_000, suffix: " Mn" },
+    { min: 1_000, suffix: " B" },
   ];
   const unit = units.find((item) => count >= item.min);
 
@@ -57,14 +57,15 @@ export function normalizeHandle(value) {
   };
 }
 
-export function previewDescription(value, limit = 25) {
+export function previewDescription(value, limit = 25, suffix = "...") {
   const clean = value.trim();
   if (clean.length <= limit) {
     return { text: clean, truncated: false };
   }
 
   return {
-    text: `${clean.slice(0, limit)}...`,
+    text: clean.slice(0, limit),
+    suffix,
     truncated: true,
   };
 }

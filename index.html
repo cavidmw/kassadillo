@@ -80,6 +80,17 @@
             <span>Kanal Bilgileri</span>
           </div>
 
+          <div class="verify-control">
+            <span>Onay rozeti</span>
+            <button class="verify-toggle is-active" id="toggleVerified" type="button" aria-pressed="true" title="Onay rozetini değiştir">
+              <span class="verify-toggle-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1Zm5.7 7.3a1 1 0 0 1 0 1.4L10 17.4l-3.7-3.7a1 1 0 1 1 1.4-1.4l2.3 2.3 6.3-6.3a1 1 0 0 1 1.4 0Z" />
+                </svg>
+              </span>
+            </button>
+          </div>
+
           <label class="field">
             <span>Kanal adı</span>
             <input id="channelName" type="text" maxlength="60" autocomplete="off" placeholder="Örn. Kanalım" />
@@ -174,7 +185,14 @@
                 <div class="channel-header">
                   <div class="channel-avatar" id="previewAvatar"></div>
                   <div class="channel-copy">
-                    <h2 id="previewName"></h2>
+                    <div class="channel-title-row">
+                      <h2 id="previewName"></h2>
+                      <span class="verified-badge" id="previewVerifiedBadge" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm5.707 7.293a1 1 0 0 1 0 1.414L10 17.414l-3.707-3.707a1 1 0 1 1 1.414-1.414L10 14.586l6.293-6.293a1 1 0 0 1 1.414 0Z" />
+                        </svg>
+                      </span>
+                    </div>
                     <div class="channel-meta">
                       <strong id="previewHandle"></strong>
                       <span class="dot" id="metaDotHandleSubs"></span>
@@ -237,12 +255,12 @@
             <path d="M20 14.35a.9.9 0 0 1 .95 1.2A9.5 9.5 0 1 1 8.45 3.05.9.9 0 0 1 9.65 4 7.2 7.2 0 0 0 20 14.35ZM7.68 5.38A7.7 7.7 0 1 0 18.62 16.3 9 9 0 0 1 7.68 5.38Z" />
           </svg>
         </button>
-        <button class="rail-button" id="copyPreviewButton" type="button" title="Ön izlemeyi kopyala" aria-label="Ön izlemeyi kopyala">
+        <span class="rail-separator"></span>
+        <button class="rail-button" id="showPreviewButton" type="button" title="Önizlemeyi göster" aria-label="Önizlemeyi göster">
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8.2 5.2 9.55 3.5h4.9l1.35 1.7h2.9A2.3 2.3 0 0 1 21 7.5v9A2.3 2.3 0 0 1 18.7 18.8H5.3A2.3 2.3 0 0 1 3 16.5v-9a2.3 2.3 0 0 1 2.3-2.3h2.9Zm.86 1.8H5.3a.5.5 0 0 0-.5.5v9c0 .28.22.5.5.5h13.4a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-3.76l-1.35-1.7h-3.18L9.06 7ZM12 8.1a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 1.8a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4Z" />
+            <path d="M12 5.4c5.15 0 8.55 4.45 9.55 6.05a1.05 1.05 0 0 1 0 1.1c-1 1.6-4.4 6.05-9.55 6.05s-8.55-4.45-9.55-6.05a1.05 1.05 0 0 1 0-1.1C3.45 9.85 6.85 5.4 12 5.4Zm0 1.8c-3.95 0-6.72 3.25-7.7 4.8.98 1.55 3.75 4.8 7.7 4.8s6.72-3.25 7.7-4.8c-.98-1.55-3.75-4.8-7.7-4.8Zm0 1.55A3.25 3.25 0 1 1 12 15.25 3.25 3.25 0 0 1 12 8.75Zm0 1.75a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" />
           </svg>
         </button>
-        <span class="rail-separator rail-separator-bottom"></span>
         <button class="rail-button feedback-rail-button" id="openFeedbackPanel" type="button" title="Yorum bildir" aria-label="Yorum bildir">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5.2 4h13.6A2.2 2.2 0 0 1 21 6.2v8.1a2.2 2.2 0 0 1-2.2 2.2h-4.45l-4.48 3.17a.9.9 0 0 1-1.42-.73V16.5H5.2A2.2 2.2 0 0 1 3 14.3V6.2A2.2 2.2 0 0 1 5.2 4Zm0 1.8a.4.4 0 0 0-.4.4v8.1c0 .22.18.4.4.4h4.15a.9.9 0 0 1 .9.9v1.6l3.28-2.32a.9.9 0 0 1 .52-.17h4.75a.4.4 0 0 0 .4-.4V6.2a.4.4 0 0 0-.4-.4H5.2Zm2.5 3.1h8.6a.85.85 0 1 1 0 1.7H7.7a.85.85 0 1 1 0-1.7Zm0 3.2h5.6a.85.85 0 1 1 0 1.7H7.7a.85.85 0 1 1 0-1.7Z" />
@@ -278,6 +296,12 @@
     </div>
 
     <div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="preview-lightbox" id="previewLightbox" hidden>
+      <div class="preview-lightbox-card" role="dialog" aria-modal="true" aria-label="YouTube önizlemesi">
+        <div class="preview-lightbox-mount" id="previewLightboxMount"></div>
+      </div>
+    </div>
 
     <div class="video-panel" id="videoPanel" hidden>
       <div class="panel-card">

@@ -180,6 +180,77 @@ p {
   color: #fff;
 }
 
+.verify-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.24);
+  color: #d8dce4;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.verify-toggle {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.18);
+  color: transparent;
+  line-height: 0;
+  transition: border-color var(--speed), background var(--speed), box-shadow var(--speed), color var(--speed), transform var(--speed);
+}
+
+.verify-toggle:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 91, 110, 0.72);
+  box-shadow: 0 12px 26px rgba(255, 31, 61, 0.14);
+}
+
+.verify-toggle.is-active {
+  border-color: rgba(255, 255, 255, 0.54);
+  background:
+    radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.2), transparent 34%),
+    linear-gradient(135deg, #0f0f10, #2b1016 72%);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 31, 61, 0.28);
+}
+
+.verify-toggle-mark {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.72) rotate(-14deg);
+  transition: opacity var(--speed), transform var(--speed);
+}
+
+.verify-toggle.is-active .verify-toggle-mark {
+  opacity: 1;
+  transform: scale(1) rotate(0);
+}
+
+.verify-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.verify-toggle svg path {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(1.02);
+}
+
 .section-title {
   display: flex;
   align-items: center;
@@ -690,10 +761,6 @@ p {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.rail-separator-bottom {
-  margin-top: 4px;
-}
-
 .icon-button {
   width: 38px;
   height: 38px;
@@ -703,7 +770,8 @@ p {
 }
 
 .video-panel,
-.feedback-panel {
+.feedback-panel,
+.preview-lightbox {
   position: fixed;
   inset: 0;
   z-index: 20;
@@ -717,13 +785,74 @@ p {
 }
 
 .video-panel.is-open,
-.feedback-panel.is-open {
+.feedback-panel.is-open,
+.preview-lightbox.is-open {
   opacity: 1;
 }
 
 .video-panel.is-closing,
-.feedback-panel.is-closing {
+.feedback-panel.is-closing,
+.preview-lightbox.is-closing {
   opacity: 0;
+}
+
+.preview-lightbox {
+  z-index: 70;
+  padding: 34px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 31, 61, 0.12), transparent 38%),
+    rgba(0, 0, 0, 0.72);
+}
+
+.preview-lightbox-card {
+  width: fit-content;
+  max-width: min(1180px, 92vw);
+  max-height: min(86vh, 920px);
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(28, 28, 30, 0.86), rgba(8, 8, 10, 0.92)),
+    rgba(0, 0, 0, 0.82);
+  box-shadow:
+    0 36px 120px rgba(0, 0, 0, 0.68),
+    0 0 80px rgba(255, 31, 61, 0.16);
+  opacity: 0;
+  transform: translateY(14px) scale(0.975);
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease;
+}
+
+.preview-lightbox.is-open .preview-lightbox-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.preview-lightbox.is-closing .preview-lightbox-card {
+  opacity: 0;
+  transform: translateY(14px) scale(0.975);
+}
+
+.preview-lightbox-mount {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.lightbox-preview-clone {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  transform-origin: top left;
+}
+
+.preview-lightbox.is-mobile-preview .preview-lightbox-card {
+  width: fit-content;
+  max-width: calc(100vw - 56px);
+  max-height: calc(100vh - 56px);
 }
 
 .thumb-preview-frame {
@@ -892,9 +1021,18 @@ p {
   }
 
   .video-panel,
-  .feedback-panel {
+  .feedback-panel,
+  .preview-lightbox {
     padding: 18px;
   }
+
+  .preview-lightbox-card {
+    width: fit-content;
+    max-width: min(100%, 760px);
+    padding: 8px;
+    border-radius: 18px;
+  }
+
 }
 
 @media (max-width: 900px) {
@@ -939,10 +1077,6 @@ p {
     width: 1px;
     height: 30px;
     margin: 0 4px;
-  }
-
-  .rail-separator-bottom {
-    display: none;
   }
 
   .feedback-rail-button {
